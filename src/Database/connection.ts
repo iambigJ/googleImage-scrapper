@@ -1,13 +1,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
-import * as dotenv from "dotenv";
-dotenv.config({path: '../../.env'})
-
-// export const sequelize :Sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
-//     host: 'localhost',
-//     dialect: 'postgres',
-// });
-
-
+import dotenv from "dotenv";
+import { join } from "path";
+dotenv.config({ path: join( __dirname ,'../../.env') });
 class Database {
     private static instance: Sequelize | null = null;
 

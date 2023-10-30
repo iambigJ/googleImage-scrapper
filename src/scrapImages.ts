@@ -1,31 +1,43 @@
 import puppeteer from 'puppeteer-core';
+import Image from "./Database/image.entity";
+import fs from 'fs'
 
-async function downloadImages(searchQuery, maxImages) {
-    const browser = await puppeteer.launch({
-        headless: false,
-        executablePath: '/usr/bin/chromium-browser'
-    });
-    const page = await browser.newPage();
-    await page.goto(`https://www.google.com/search?q=${searchQuery}&tbm=isch`);
-    await page.setViewport({ width: 1200, height: 800 });
+export async function downloadImages(searchQuery: string, maxImages: number): Promise<string[]> {
+    let browser
+    let imageUrls: string[] = [];
 
-    const image_src = await page.evaluate((maxImages) => {
-        const elements = document.querySelectorAll('.rg_i');
-        const imageSources = [];
-        console.log(typeof elements)
-        for (const element of elements) {
-            const imageUrl = element.getAttribute('src');
-            if (imageUrl && imageSources.length < maxImages) {
-                imageSources.push(imageUrl);
+    try {
+        browser = await puppeteer.launch({
+            headless: false,
+            executablePath: '/usr/bin/chromium-browser'
+        });
+
+        const page = await browser.newPage();
+        await page.goto(`https://www.google.com/search?q=${searchQuery}&tbm=isch`);
+        await page.setViewport({ width: 1200, height: 800 });
+
+        const imageSources = await page.evaluate((maxImages) => {
+            const elements = document.querySelectorAll('.rg_i');
+            const imageSources = [];
+            for (const element of elements) {
+                const imageUrl = element.getAttribute('src');
+                if (imageUrl && imageSources.length < maxImages) {
+                    imageSources.push(imageUrl);
+                }
             }
+            return imageSources;
+        }, maxImages);
+
+        imageUrls = imageSources;
+    } catch (err) {
+        console.error(`ERROR from scraping image: ${err}`);
+    } finally {
+        if (browser) {
+            await browser.close();
         }
-        return imageSources;
-    }, maxImages);
-    return image_src
-    page.close()
+    }
+
+    return imageUrls;
 }
 
-(async () => {
-    const x = await downloadImages('cats', 10);
-    console.log(x);
-})();
+// Example usage

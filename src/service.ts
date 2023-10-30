@@ -1,12 +1,10 @@
-import * as dotenv from "dotenv";
-dotenv.config({path: '../.env'})
-import Image from './Database/entity';
- class Service {
-    constructor(private readonly imageModel: typeof Image) {}
+
+ export default  class Service {
+    constructor(private readonly Model) {}
     async createImage(image: string): Promise<void> {
         try {
-            await this.imageModel.create({
-                Image: image,
+            await this.Model.create({
+                imageUrl: image,
             });
             console.log('Image created successfully.');
         } catch (error) {
@@ -16,7 +14,7 @@ import Image from './Database/entity';
     }
 }
 
-export const service = new Service(Image)
+
 
 
 
