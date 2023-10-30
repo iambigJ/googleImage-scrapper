@@ -22,7 +22,7 @@ export const saveBase64ImagesToFile = async (base64Data: string[], name: string)
         const data = base64.replace(/^data:image\/\w+;base64,/, '');
         const buffer: Buffer = Buffer.from(data, 'base64');
 
-        const writeFilePromise = new Promise<string>((resolve, reject) => {
+        const writeFilePromise : Promise<string> = new Promise<string>((resolve, reject) => {
             const writeStream = fs.createWriteStream(filename);
             writeStream.write(buffer);
             writeStream.end();

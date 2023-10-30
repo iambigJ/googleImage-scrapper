@@ -8,7 +8,7 @@ export async function downloadImages(searchQuery: string, maxImages: number): Pr
 
     try {
         browser = await puppeteer.launch({
-            headless: false,
+            headless: 'new',
             executablePath: '/usr/bin/chromium-browser'
         });
 
@@ -18,9 +18,9 @@ export async function downloadImages(searchQuery: string, maxImages: number): Pr
 
         const imageSources = await page.evaluate((maxImages) => {
             const elements = document.querySelectorAll('.rg_i');
-            const imageSources = [];
+            const imageSources: string[] = [];
             for (const element of elements) {
-                const imageUrl = element.getAttribute('src');
+                const imageUrl:string = element.getAttribute('src');
                 if (imageUrl && imageSources.length < maxImages) {
                     imageSources.push(imageUrl);
                 }
@@ -40,4 +40,3 @@ export async function downloadImages(searchQuery: string, maxImages: number): Pr
     return imageUrls;
 }
 
-// Example usage
