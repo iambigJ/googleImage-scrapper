@@ -1,0 +1,16 @@
+version: '3'
+services:
+  postgres:
+    restart: always
+    image: postgres
+    container_name: postgres-nestTemplate
+    volumes:
+      - postgres-nestTemplate:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    network_mode: host
+volumes:
+  postgres-nestTemplate:
+
