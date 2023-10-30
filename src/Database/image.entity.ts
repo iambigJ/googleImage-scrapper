@@ -8,7 +8,7 @@ const Image = (sequelize) => {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
         },
-        imageUrl: { // Changed 'Image' to 'imageUrl' for better clarity
+        imagePath: { // Changed 'Image' to 'imageUrl' for better clarity
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,

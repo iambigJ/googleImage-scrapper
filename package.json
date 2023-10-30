@@ -22,6 +22,7 @@
     "puppeteer-core": "^21.4.1",
     "sequelize": "^6.33.0",
     "sequelize-typescript": "^2.1.5",
+    "sharp": "^0.32.6",
     "uuid": "^9.0.1"
   }
 }

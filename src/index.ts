@@ -1,21 +1,14 @@
-import dotenv from "dotenv";
-import { join } from "path";
-import Service from './service'
-import Database from './Database/connection'
-import Image from "./Database/image.entity";
-import { Sequelize } from 'sequelize-typescript'
-import {downloadImages} from "./scrapImages";
-import {saveBase64ImagesToFile} from './saveimages'
+import {downloadImages} from "./scrap.imageSources";
+import {saveBase64ImagesToFile} from './save.images.onFile'
+import InsertImagesToDatabase from './insert.images.toDatabase'
+import {resize} from "./resize.images";
 
 const intial = async (): Promise<void> => {
-    const database = Database.getInstance()
-    await database.sync({force: false})
-    const model = Image(database)
-    const service = new Service(model)
-    const buffer: string[]  = await  downloadImages('cutecats',10)
-    console.log(buffer.length)
-    saveBase64ImagesToFile(buffer,'cute')
 
+    const buffer: string[]  = await  downloadImages('cutecats',100)
+    const imagePathes = await saveBase64ImagesToFile(buffer,'cute')
+   const a = await resize(imagePathes,'cutecats')
+    // const x = await InsertImagesToDatabase(a)
 
 }
 intial()

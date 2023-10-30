@@ -4,7 +4,7 @@
     async createImage(image: string): Promise<void> {
         try {
             await this.Model.create({
-                imageUrl: image,
+                imagePath: image,
             });
             console.log('Image created successfully.');
         } catch (error) {

@@ -16,6 +16,11 @@ class Database {
         }
         return Database.instance;
     }
+    static async syncDatabase(force: boolean = false): Promise<void> {
+        const instance = this.getInstance();
+        await instance.sync({ force : true});
+        console.log('Database synchronized successfully!');
+    }
 }
 
 export default Database;
