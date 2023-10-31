@@ -1,55 +1,72 @@
-//write it test after work soon
-import { resize } from '../src/resize.images';
-import  sharp from 'sharp';
-import { v4 as uuidv4 } from 'uuid';
-// Mock the sharp library to avoid actual file operations
-const mock_imp =  jest.fn().mockImplementation(()=>{return {id:123}})
+// Import necessary dependencies and functions
+import  InsertImagesToDatabase  from '../src/insert.images.toDatabase'; // Replace with the correct path to your function
 
-// jest.mock('sharp', () => {
-//     return {
-//         default: jest.fn().mockReturnThis(),
-//         resize: jest.fn().mockReturnThis(),
-//         toFile: jest.fn().mockImplementation(async (filePath) => {
-//             // Your custom implementation logic here
-//             return filePath;
-//         }),
-//     };
-// });
-jest.mock('uuid', () => ({
-    v4: jest.fn().mockReturnValue('mocked-uuid'),
+// Mock Database class, Image model, and Service class
+jest.mock('../src/insert.images.toDatabase', () => ({
+    Database: {
+        getInstance: jest.fn().mockResolvedValue({
+            syncDatabase: jest.fn().mockResolvedValue(true)
+        })
+    },
+    Image: jest.fn(),
+    Service: jest.fn()
 }));
 
-describe('resize', () => {
-    it('resizes images and returns an array of resized image paths', async () => {
+describe('InsertImagesToDatabase', () => {
+    it('inserts images to the database', async () => {
         // Arrange
-        const inputImagePaths = ['/path/to/image1.jpg', '/path/to/image2.jpg'];
-        const name = 'example';
-        const expectedResizedPaths = ['/data/example-mocked-uuid.jpg', '/data/example-mocked-uuid.jpg'];
+        const imagePaths = ['/path/to/image1.jpg', '/path/to/image2.jpg'];
+        const mockCreateImage = jest.fn().mockResolvedValue(true);
+        const mockServiceInstance = {
+            createImage: mockCreateImage
+        };
+        const mockService = jest.fn().mockImplementation(() => mockServiceInstance);
+        const mockImageModelInstance = {
+            someModelMethod: jest.fn()
+        };
+        const mockImageModel = jest.fn().mockImplementation(() => mockImageModelInstance);
+        const mockDatabaseInstance = {
+            syncDatabase: jest.fn().mockResolvedValue(true)
+        };
+        const mockDatabase = {
+            getInstance: jest.fn().mockResolvedValue(mockDatabaseInstance)
+        };
 
         // Act
-        const resizedImagePaths = await resize(inputImagePaths, name);
+        await InsertImagesToDatabase(imagePaths);
 
         // Assert
-        expect(sharp).toHaveBeenCalledWith('/path/to/image1.jpg');
-        expect(sharp).toHaveBeenCalledWith('/path/to/image2.jpg');
-        expect(resizedImagePaths).toEqual(expectedResizedPaths);
+        expect(mockDatabase.getInstance).toHaveBeenCalled();
+        expect(mockDatabaseInstance.syncDatabase).toHaveBeenCalledWith(true);
+        expect(mockImageModel).toHaveBeenCalledWith(mockDatabaseInstance);
+        expect(mockService).toHaveBeenCalledWith(mockImageModelInstance);
+        expect(mockCreateImage).toHaveBeenCalledTimes(2);
+        expect(mockCreateImage).toHaveBeenCalledWith(imagePaths[0]);
+        expect(mockCreateImage).toHaveBeenCalledWith(imagePaths[1]);
     });
-    //
-    // it('handles errors and throws an error', async () => {
-    //     // Arrange
-    //     const inputImagePaths = ['/path/to/image1.jpg'];
-    //     const name = 'example';
-    //     const expectedError = new Error('Mocked resize error');
-    //     (sharp as jest.Mock).mockImplementationOnce(() => ({
-    //         resize: jest.fn().mockReturnThis(),
-    //         toFile: jest.fn().mockRejectedValue(expectedError),
-    //     }));
-    //
-    //     // Act and Assert
-    //     await expect(resize(inputImagePaths, name)).rejects.toThrowError(expectedError);
-    // });
+
+    it('handles errors during image insertion', async () => {
+        // Arrange
+        const imagePaths = ['/path/to/image1.jpg', '/path/to/image2.jpg'];
+        const mockCreateImage = jest.fn()
+            .mockResolvedValueOnce(true)
+            .mockRejectedValueOnce(new Error('Image insertion failed'));
+        const mockServiceInstance = {
+            createImage: mockCreateImage
+        };
+        const mockService = jest.fn().mockImplementation(() => mockServiceInstance);
+        const mockImageModelInstance = {
+            someModelMethod: jest.fn()
+        };
+        const mockImageModel = jest.fn().mockImplementation(() => mockImageModelInstance);
+        const mockDatabaseInstance = {
+            syncDatabase: jest.fn().mockResolvedValue(true)
+        };
+        const mockDatabase = {
+            getInstance: jest.fn().mockResolvedValue(mockDatabaseInstance)
+        };
+
+        // Act & Assert
+        await expect(InsertImagesToDatabase(imagePaths)).rejects.toThrow('Image insertion failed');
+    });
 });
-
-
-
-
